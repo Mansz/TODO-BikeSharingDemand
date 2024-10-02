@@ -1,0 +1,18 @@
+### Menambahkan `url.txt`
+
+Setelah Anda mendeploy dashboard ke Streamlit Cloud, masukkan URL dashboard ke dalam berkas `url.txt`.
+
+### Analisis Lanjutan
+
+Sebagai contoh analisis RFM, Anda dapat menambahkan kode berikut di notebook:
+
+```python
+# RFM Analysis
+snapshot_date = day_data['dteday'].max() + pd.Timedelta(days=1)
+rfm = day_data.groupby('user_id').agg({
+    'dteday': lambda x: (snapshot_date - x.max()).days,
+    'cnt': 'sum'
+}).rename(columns={'dteday': 'Recency', 'cnt': 'Frequency'})
+
+# Monetary bisa dihitung jika ada informasi harga sewa
+# rfm['Monetary'] = rfm['Frequency'] * average_price_per_rental

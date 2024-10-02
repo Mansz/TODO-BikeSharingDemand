@@ -1,37 +1,39 @@
 import pandas as pd
-import streamlit as st
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import streamlit as st
 
-# Load data
+# Load datasets
 day_data = pd.read_csv('../data/day.csv')
 hour_data = pd.read_csv('../data/hour.csv')
 
 # Title of the dashboard
 st.title('Dashboard Penyewaan Sepeda')
 
-# Display the day data
+# Display the first few rows of the datasets
 st.subheader('Data Harian')
-st.write(day_data)
+st.write(day_data.head())
 
-# Display the hour data
-st.subheader('Data Jam')
-st.write(hour_data)
+# Pertanyaan 1: Pengaruh cuaca terhadap jumlah penyewaan sepeda
+st.subheader('Distribusi Jumlah Penyewaan Berdasarkan Cuaca')
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='weathersit', y='cnt', data=day_data)
+plt.title('Count Distribution by Weather Situation')
+plt.xlabel('Weather Situation')
+plt.ylabel('Count of Rentals')
+plt.xticks([0, 1, 2, 3], ['Clear', 'Mist', 'Light Rain', 'Heavy Rain'])
+st.pyplot(plt)
 
-# Visualisasi: Distribusi Jumlah Penyewaan dari Data Harian
-st.subheader('Distribusi Jumlah Penyewaan (Data Harian)')
-fig, ax = plt.subplots()
-sns.histplot(day_data['cnt'], bins=30, kde=True, ax=ax)
-ax.set_title('Distribusi Jumlah Penyewaan')
-ax.set_xlabel('Jumlah Penyewaan')
-ax.set_ylabel('Frekuensi')
-st.pyplot(fig)
+# Pertanyaan 2: Tren penggunaan sepeda dari waktu ke waktu
+st.subheader('Tren Penyewaan Sepeda Seiring Waktu')
+hour_data['dteday'] = pd.to_datetime(hour_data['dteday'])
+trend_data = hour_data.groupby('dteday').sum().reset_index()
 
-# Visualisasi: Distribusi Jumlah Penyewaan dari Data Jam
-st.subheader('Distribusi Jumlah Penyewaan (Data Jam)')
-fig_hour, ax_hour = plt.subplots()
-sns.histplot(hour_data['cnt'], bins=30, kde=True, ax=ax_hour)
-ax_hour.set_title('Distribusi Jumlah Penyewaan per Jam')
-ax_hour.set_xlabel('Jumlah Penyewaan')
-ax_hour.set_ylabel('Frekuensi')
-st.pyplot(fig_hour)
+plt.figure(figsize=(12, 6))
+sns.lineplot(x='dteday', y='cnt', data=trend_data)
+plt.title('Total Bike Rentals Over Time')
+plt.xlabel('Date')
+plt.ylabel('Total Count of Rentals')
+plt.xticks(rotation=45)
+st.pyplot(plt)
